@@ -74,6 +74,14 @@ $npm i -g jest-cli
 $jest src/__tests__/your_test_file.js
 ```
 
+Installer pour que ca marche: 
+
+```
+$ npm i jest --save-dev
+$ npm i jest-environment-jsdom --save-dev
+
+```
+
 ## Comment voir la couverture de test ?
 
 `http://127.0.0.1:8080/coverage/lcov-report/`
