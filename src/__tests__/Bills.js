@@ -12,6 +12,8 @@ import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
 import {localStorageMock} from "../__mocks__/localStorage.js";
 import router from "../app/Router.js";
 
+import mockStore from "../__mocks__/store";
+
 describe("Given I am connected as an employee", () => {
   describe("When I am on Bills Page", () => {
     test("Then bill icon in vertical layout should be highlighted", async () => {
@@ -67,10 +69,34 @@ describe("Given I am connected as an employee", () => {
       expect(screen.getByTestId('form-new-bill')).toBeTruthy(); // then check that the form is indeed present on the page
     })
 
-    test('Then, Loading page should be rendered', () => {
-      document.body.innerHTML = BillsUI({ loading: true })
-      expect(screen.getAllByText('Loading...')).toBeTruthy()
+    test('Then, it should open the modal', () => {
+
+      $.fn.modal = jest.fn(); // empêche erreur jQuery
+
+      const onNavigate = (pathname) => {
+        document.body.innerHTML = ROUTES({ pathname })
+      }
+
+      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+      window.localStorage.setItem('user', JSON.stringify({ type: 'Employee' }))
+  
+      document.body.innerHTML = BillsUI({ data: bills })
+
+      const billsContainer = new Bills({
+        document, onNavigate, store: mockStore, localStorage: window.localStorage
+      });
+
+      const iconView = screen.getAllByTestId('icon-eye')[0]
+
+      const openViewModal = jest.fn(billsContainer.handleClickIconEye(iconView))
+
+      iconView.addEventListener('click', openViewModal) 
+      userEvent.click(iconView)
+
+      expect(openViewModal).toHaveBeenCalled(); // we expected that the function has been called and therefore the page loaded
+      const modale = screen.getByTestId('modaleFile'); // we added a data-testid to the modal in BillsUI that we get
+      expect(modale).toBeTruthy(); // the modal is expected to be present
     })
-    
+
   })
 })
