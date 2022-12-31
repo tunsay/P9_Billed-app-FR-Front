@@ -3,13 +3,13 @@
  */
 
 import "@testing-library/jest-dom"
-import { screen, waitFor, fireEvent } from "@testing-library/dom"
+import userEvent from '@testing-library/user-event'
+import {screen, waitFor, fireEvent} from "@testing-library/dom"
+import BillsUI from "../views/BillsUI.js";
 import Bills from '../containers/Bills.js';
-import BillsUI from "../views/BillsUI.js"
-import { bills } from "../fixtures/bills.js"
-import { ROUTES_PATH, ROUTES } from "../constants/routes.js";
-import { localStorageMock } from "../__mocks__/localStorage.js";
-
+import { bills } from "../fixtures/bills.js";
+import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
+import {localStorageMock} from "../__mocks__/localStorage.js";
 import router from "../app/Router.js";
 
 describe("Given I am connected as an employee", () => {
@@ -30,6 +30,7 @@ describe("Given I am connected as an employee", () => {
       //The classlist active-icon will higlight the icon
       expect(windowIcon).toHaveClass('active-icon')
     })
+
     test("Then bills should be ordered from earliest to latest", () => {
 
       document.body.innerHTML = BillsUI({ data: bills })
@@ -38,28 +39,38 @@ describe("Given I am connected as an employee", () => {
       const datesSorted = [...dates].sort(antiChrono)
       expect(dates).toEqual(datesSorted)
     })
+
     test('Then i click in the button new bill, the path "new bill" should be defined', () => {
-
-      //Je prends l'élément du boutton qui permet de faire afficher le New bill
-      const buttonNewBill = screen.getByTestId("btn-new-bill")
-
+      // define the path
       const onNavigate = (pathname) => {
         document.body.innerHTML = ROUTES({ pathname })
       }
 
-      const billsContainer = new Bills({
-        document, onNavigate, store: null, bills: bills, localStorage: window.localStorage
-      });
+      //show page data
+      Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+      window.localStorage.setItem('user', JSON.stringify({
+        type: 'employee'
+      }))
 
+      const billsContainer = new Bills({
+        document, onNavigate, store: null, bills:bills, localStorage: window.localStorage
+      })
       document.body.innerHTML = BillsUI({ data: { bills } })
 
-      const openNewBillPage = jest.fn(billsContainer.handleClickNewBill);
+      const openNewBillPage = jest.fn(billsContainer.handleClickNewBill); // create the function to test
+      const buttonNewBill = screen.getByTestId("btn-new-bill"); // get the new expense report button
 
-      buttonNewBill.addEventListener('click', openNewBillPage);
-      fireEvent.click(buttonNewBill)
-      
-      expect(openNewBillPage).toHaveBeenCalled();
-      expect(screen.getByTestId('form-new-bill')).toBeTruthy();
+      buttonNewBill.addEventListener('click', openNewBillPage); // trigger the vent click
+      userEvent.click(buttonNewBill); // mock the click
+
+      expect(openNewBillPage).toHaveBeenCalled(); // we expected that the function has been called and therefore the page loaded
+      expect(screen.getByTestId('form-new-bill')).toBeTruthy(); // then check that the form is indeed present on the page
     })
+
+    test('Then, Loading page should be rendered', () => {
+      document.body.innerHTML = BillsUI({ loading: true })
+      expect(screen.getAllByText('Loading...')).toBeTruthy()
+    })
+    
   })
 })
