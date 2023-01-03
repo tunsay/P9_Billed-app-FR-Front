@@ -55,6 +55,9 @@ export default class {
           console.log('length', bills.length)
         return bills
       })
+      .catch( e => {
+        console.log(e)
+      })
     }
   }
 }
