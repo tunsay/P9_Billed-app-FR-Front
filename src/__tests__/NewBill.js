@@ -156,7 +156,7 @@ describe('Given I am a user connected as Employee', () => {
         store: mockStore,
         localStorage: window.localStorage,
       })
-      // créé les données d'une note de frais à tester
+      // create data of bill
       const sampleBill = {
         type: 'Hôtel et logement',
         name: 'encore',
@@ -182,21 +182,20 @@ describe('Given I am a user connected as Employee', () => {
 
       newBill.fileName = sampleBill.fileName
       newBill.fileUrl = sampleBill.fileUrl
-// TODO remplacer la fonction update avec un spyOn
-      newBill.updateBill = jest.fn() // crée fonction d'update
-      const handleSubmit = jest.fn((e) => newBill.handleSubmit(e)) // crée fonction de submit
+      newBill.updateBill = jest.fn()
+      const handleSubmit = jest.fn((e) => newBill.handleSubmit(e))
 
-      const form = screen.getByTestId('form-new-bill') // récupère le formulaire
-      form.addEventListener('submit', handleSubmit) // écoute la fonction au submit
-      fireEvent.submit(form) // lance l'évènement submit
+      const form = screen.getByTestId('form-new-bill')
+      form.addEventListener('submit', handleSubmit)
+      fireEvent.submit(form)
 
-      expect(handleSubmit).toHaveBeenCalled() // on s'attend à ce que la fonction submit ait été appellée
-      expect(newBill.updateBill).toHaveBeenCalled() // on s'attend à ce que la fonction d'update ait été appellée
+      expect(handleSubmit).toHaveBeenCalled()
+      expect(newBill.updateBill).toHaveBeenCalled()
     })
     // test erreur API
     test('fetches error from an API and fails with 500 error', async () => {
       jest.spyOn(mockStore, 'bills')
-      jest.spyOn(console, 'error').mockImplementation(() => {}) // empêche console.error jest error
+      jest.spyOn(console, 'error').mockImplementation(() => {}) // prevent errror
       Object.defineProperty(window, 'localStorage', { value: localStorageMock })
       Object.defineProperty(window, 'location', {
         value: { hash: ROUTES_PATH['NewBill'] },
@@ -230,7 +229,7 @@ describe('Given I am a user connected as Employee', () => {
       form.addEventListener('submit', handleSubmit)
       fireEvent.submit(form)
       await new Promise(process.nextTick)
-      expect(console.error).toBeCalled() // s'attend à ce qu'une erreur soit appellée dans la console
+      expect(console.error).toBeCalled()
     })
   })
 })

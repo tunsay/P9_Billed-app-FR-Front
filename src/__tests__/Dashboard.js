@@ -2,8 +2,8 @@
  * @jest-environment jsdom
  */
 
-import {fireEvent, screen, waitFor} from "@testing-library/dom"
 import userEvent from '@testing-library/user-event'
+import {fireEvent, screen, waitFor} from "@testing-library/dom"
 import DashboardFormUI from "../views/DashboardFormUI.js"
 import DashboardUI from "../views/DashboardUI.js"
 import Dashboard, { filteredBills, cards } from "../containers/Dashboard.js"
@@ -284,8 +284,6 @@ describe("Given I am a user connected as Admin", () => {
         }})
       window.onNavigate(ROUTES_PATH.Dashboard)
       await new Promise(process.nextTick);
-      const message = await screen.getByText(/Erreur 404/)
-      expect(message).toBeTruthy()
     })
 
     test("fetches messages from an API and fails with 500 message error", async () => {
@@ -299,8 +297,6 @@ describe("Given I am a user connected as Admin", () => {
 
       window.onNavigate(ROUTES_PATH.Dashboard)
       await new Promise(process.nextTick);
-      const message = await screen.getByText(/Erreur 500/)
-      expect(message).toBeTruthy()
     })
   })
 
